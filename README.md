@@ -113,29 +113,41 @@
 
 ```
 olist-review-attribution/
-├── sql/
-│   ├── 01_create_schema.sql       # 建 schema 与表
-│   ├── 02_import_data.sql         # 导入 9 个 CSV（\copy）
-│   ├── 03_constraints_views.sql   # 外键、索引、分析视图
-│   ├── 04_data_exploration.sql    # 数据探索与质量检查
-│   ├── 06_factor_analysis.sql     # ★ 31 条归因查询（7 个部分）
-│   └── 07_pbi_view.sql            # ★ BI 专用订单级宽表
-├── analysis/
-│   ├── stat_analysis.py           # 相关分析、效应量、卡方检验
-│   ├── rigorous_model.py          # ★ OLS / Logit / 随机森林
-│   ├── shoot_results.py           # SQL 结果截图
-│   ├── make_report.py             # 报告自动生成
-│   └── output/                    # 8 张统计图 + 13 个结果 CSV
-├── results/                       # 31 张 SQL 查询结果截图
-├── powerbi/
-│   ├── olist_dashboard.pbix
-│   ├── DAX_度量值与计算列.dax
-│   └── screenshots/               # 6 页仪表盘截图
-├── docs/
-│   ├── report.pdf                 # 完整分析报告
-│   └── dashboard.pdf              # 仪表盘导出
-└── data/                          # 原始 CSV（已 gitignore，需自行下载）
+│
+├── sql/                          # SQL 全部在这里
+│   ├── 01_create_schema.sql      #   建 schema 与表
+│   ├── 02_import_data.sql        #   导入 9 个 CSV（\copy）
+│   ├── 03_constraints_views.sql  #   外键、索引、分析视图
+│   ├── 04_data_exploration.sql   #   数据探索与质量检查
+│   ├── 06_factor_analysis.sql    #   ★ 31 条归因查询（7 个部分）
+│   └── 07_pbi_view.sql           #   ★ BI 专用订单级宽表
+│
+├── python/                       # Python 脚本与输出
+│   ├── stat_analysis.py          #   相关分析、效应量、卡方检验
+│   ├── rigorous_model.py         #   ★ OLS / Logit / 随机森林
+│   ├── shoot_results.py          #   SQL 结果截图
+│   ├── make_github_report.py     #   报告自动生成
+│   └── output/                   #   8 张统计图 + 13 个结果 CSV
+│
+├── powerbi/                      # 仪表盘
+│   ├── olist_dashboard.pbix      #   Power BI 工程文件
+│   ├── measures.dax              #   17 个度量值 + 7 个计算列
+│   └── screenshots/              #   6 页仪表盘截图
+│
+├── docs/                         # 文档
+│   ├── report.docx               #   ★ 完整分析报告（Word）
+│   ├── report.pdf                #   ★ 完整分析报告（PDF）
+│   ├── dashboard.pdf             #   仪表盘导出
+│   └── sql_results/              #   31 张 SQL 查询结果截图
+│
+└── data/                         # 原始 CSV（gitignore，需自行下载）
 ```
+
+## 📄 完整报告
+
+- [**report.docx**](docs/report.docx) —— Word 版完整报告（35 页，含 6 页仪表盘横版展示）
+- [**report.pdf**](docs/report.pdf) —— PDF 版，适合直接阅读
+- [**dashboard.pdf**](docs/dashboard.pdf) —— 仪表盘单独导出
 
 ---
 
@@ -157,8 +169,8 @@ psql -h 127.0.0.1 -U postgres -d analysis -f sql/07_pbi_view.sql
 ### 3. 跑分析
 
 ```bash
-python analysis/stat_analysis.py     # 相关分析 → 5 张图 + 7 个 CSV
-python analysis/rigorous_model.py    # 多元建模 → 3 张图 + 6 个 CSV
+python python/stat_analysis.py     # 相关分析 → 5 张图 + 7 个 CSV
+python python/rigorous_model.py    # 多元建模 → 3 张图 + 6 个 CSV
 ```
 
 ### 4. 打开仪表盘

@@ -15,7 +15,7 @@
     G. 边际效应与业务解读
 
 依赖：numpy pandas scipy sklearn matplotlib seaborn sqlalchemy psycopg2
-运行：python analysis/rigorous_model.py
+运行：python python/rigorous_model.py
 ================================================================================
 """
 
@@ -39,7 +39,8 @@ import seaborn as sns
 warnings.filterwarnings('ignore')
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(BASE, 'analysis', 'output')
+# 输出目录跟着脚本走，与文件夹改名无关
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
 os.makedirs(OUT, exist_ok=True)
 
 DB = dict(host='127.0.0.1', port=5432, db='analysis', user='postgres', pwd='123456')

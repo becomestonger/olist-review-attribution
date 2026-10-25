@@ -13,8 +13,8 @@ from docx.oxml import OxmlElement
 from PIL import Image
 
 BASE = r'C:\Users\28223\Desktop\巴西olist数据分析项目'
-RES = os.path.join(BASE, 'results')
-FIG = os.path.join(BASE, 'analysis', 'output')
+RES = os.path.join(BASE, 'docs', 'sql_results')
+FIG = os.path.join(BASE, 'python', 'output')
 OUT = os.environ.get('REPORT_OUT') or os.path.join(
     BASE, 'Olist巴西电商_差评归因分析报告.docx')
 

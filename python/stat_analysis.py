@@ -20,7 +20,7 @@
     第 10 部分 导出结果到 analysis/output/
 
 运行方式（Windows，本机 Python 3.11）：
-    python analysis/stat_analysis.py
+    python python/stat_analysis.py
 
 依赖：numpy pandas matplotlib seaborn scipy sqlalchemy psycopg2-binary
 ================================================================================
@@ -46,7 +46,8 @@ warnings.filterwarnings('ignore')
 # 0. 全局配置
 # ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT_DIR = os.path.join(BASE_DIR, 'analysis', 'output')
+# 输出目录跟着脚本走，与文件夹改名无关
+OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
 os.makedirs(OUT_DIR, exist_ok=True)
 
 DB = dict(host='127.0.0.1', port=5432, db='analysis',

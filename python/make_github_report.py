@@ -14,9 +14,9 @@ from docx.oxml import OxmlElement
 from PIL import Image
 
 BASE = r'C:\Users\28223\Desktop\巴西olist数据分析项目'
-RES = os.path.join(BASE, 'results')
-FIG = os.path.join(BASE, 'analysis', 'output')
-PBI = os.path.join(BASE, 'powerbi', 'screenshots', 'pbi')
+RES = os.path.join(BASE, 'docs', 'sql_results')
+FIG = os.path.join(BASE, 'python', 'output')
+PBI = os.path.join(BASE, 'powerbi', 'screenshots')
 OUT = os.environ.get('REPORT_OUT') or os.path.join(
     BASE, 'Olist巴西电商_差评归因分析报告_GitHub版.docx')
 
@@ -781,7 +781,7 @@ add_table(['页面', '内容', '核心图表'],
 
 page_break()
 h2('P1 经营总览', '4.1')
-add_figure(os.path.join(PBI, 'page-0001.png'),
+add_figure(os.path.join(PBI, '01_经营总览.png'),
            '仪表盘 P1  经营总览：99,441 单 / R$ 15.84M / 客单价 R$ 159.33 / 评分 4.09 / 差评率 14.63%',
            max_h=13.3)
 
@@ -789,31 +789,31 @@ page_break()
 h2('P2 差评归因（核心页）', '4.2')
 para('这一页是整份报告核心结论的可视化：六个因素分别作为一个柱形图，'
      'Y 轴统一为差评率、统一量程 0–60%，方便横向对比。', indent=0.8)
-add_figure(os.path.join(PBI, 'page-0002.png'),
+add_figure(os.path.join(PBI, '02_差评归因.png'),
            '仪表盘 P2  差评归因：迟到 53.94% vs 准时 9.18%；超期 23.69% vs 按期 11.68%；'
            '跨州 14.07% vs 同州 10.43%', max_h=12.5)
 
 page_break()
 h2('P3 流程拆解', '4.3')
-add_figure(os.path.join(PBI, 'page-0003.png'),
+add_figure(os.path.join(PBI, '03_流程拆解.png'),
            '仪表盘 P3  流程拆解：运输占 74.23%，是绝对瓶颈；月度迟到率在 2018-03 达到 21.4%',
            max_h=13.3)
 
 page_break()
 h2('P4 地域分析', '4.4')
-add_figure(os.path.join(PBI, 'page-0004.png'),
+add_figure(os.path.join(PBI, '04_地域分析.png'),
            '仪表盘 P4  地域分析：AL 迟到率 23.93% 最高，RO 仅 2.9%；'
            '气泡图展示"运输天数 × 迟到率 × 订单量"', max_h=13.3)
 
 page_break()
 h2('P5 品类分析', '4.5')
-add_figure(os.path.join(PBI, 'page-0005.png'),
+add_figure(os.path.join(PBI, '05_品类分析.png'),
            '仪表盘 P5  品类分析：office_furniture 差评 22.51% 且备货 9.92 天（物流型）；'
            'audio 差评 21.51% 但备货仅 2.51 天（商品型）', max_h=13.3)
 
 page_break()
 h2('P6 数据说明', '4.6')
-add_figure(os.path.join(PBI, 'page-0006.png'),
+add_figure(os.path.join(PBI, '06_数据说明.png'),
            '仪表盘 P6  数据说明：数据来源、指标口径、分析方法、已知局限与修正记录', max_h=13.3)
 
 portrait_section()

@@ -16,7 +16,7 @@ PSQL = r'C:\Users\28223\pgsql\bin\psql.exe'
 EDGE = r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
 BASE = r'C:\Users\28223\Desktop\巴西olist数据分析项目'
 SQL_FILE = os.path.join(BASE, 'sql', '06_factor_analysis.sql')
-OUT_DIR = os.path.join(BASE, 'results')
+OUT_DIR = os.path.join(BASE, 'docs', 'sql_results')
 TMP_DIR = os.path.join(os.environ['TEMP'], 'olist_shot')
 
 env = os.environ.copy()
