@@ -1,0 +1,11 @@
+﻿# 统一换行符，消除 CRLF 警告
+* text=auto eol=lf
+
+# 二进制文件不做换行转换
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.docx binary
+*.xlsx binary
+*.pbix binary
+*.ipynb text eol=lf

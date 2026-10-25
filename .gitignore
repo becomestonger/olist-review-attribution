@@ -1,0 +1,64 @@
+# ============================================================
+# 根目录的原始数据（约 120 MB）不进仓库
+# 请从 Kaggle 下载后放在根目录或 data/ 下
+# https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+# ============================================================
+/olist_customers_dataset.csv
+/olist_geolocation_dataset.csv
+/olist_order_items_dataset.csv
+/olist_order_payments_dataset.csv
+/olist_order_reviews_dataset.csv
+/olist_orders_dataset.csv
+/olist_products_dataset.csv
+/olist_sellers_dataset.csv
+/product_category_name_translation.csv
+data/
+
+# 注意：analysis/output/*.csv 是分析结果，需要提交，因此不用 *.csv 通配
+
+# ============================================================
+# 本地个人文件（面试准备材料等，不公开）
+# ============================================================
+_local/
+
+# ============================================================
+# 临时文件 / 草稿
+# ============================================================
+_temp/
+_scratch/
+*.tmp
+*.bak
+~$*
+*.log
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.env
+.env.local
+
+# ============================================================
+# 编辑器 / 系统
+# ============================================================
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code 本地配置（含本机 Python 路径）
+.vscode/
+
+# 临时：与 docs/report.docx 重复（被编辑器占用，关闭后可删除）
+/Olist巴西电商_差评归因分析报告_GitHub版.docx

@@ -1,0 +1,257 @@
+-- ============================================================================
+--  Olist Power BI 报表 · DAX 全集（已在 Power BI 中确认表名）
+--
+--  表名：'olist v_pbi_orders'
+--        ↑ 因为名字里有空格，DAX 里必须用单引号包住，且列引用写成
+--          'olist v_pbi_orders'[列名]
+--
+--  建法：
+--    · 度量值 → 右键表 → 新建度量值 → 粘一段 → Enter
+--    · 计算列 → 右键表 → 新建计算列 → 粘一段 → Enter
+--    · 一次只能建一个，不要整段粘进同一个公式栏
+-- ============================================================================
+
+
+/* ===========================================================================
+   一、度量值（17 个）
+   =========================================================================== */
+
+-- ═══ A 组：基础指标（P1 页多行卡用）═══════════════════════════════════════
+
+-- 1
+订单数 = COUNTROWS ( 'olist v_pbi_orders' )
+
+-- 2
+订单总额 = SUM ( 'olist v_pbi_orders'[order_total] )
+
+-- 3
+客单价 = DIVIDE ( [订单总额], [订单数] )
+
+-- 4
+平均评分 = AVERAGE ( 'olist v_pbi_orders'[review_score] )
+
+
+-- ═══ B 组：差评率（P2 全部图表的 Y 轴）════════════════════════════════════
+
+-- 5  差评率的分母：只数有评分的订单
+有评分订单数 =
+CALCULATE (
+    COUNTROWS ( 'olist v_pbi_orders' ),
+    NOT ISBLANK ( 'olist v_pbi_orders'[review_score] )
+)
+
+-- 6  差评率的分子：1-2 星
+差评订单数 =
+CALCULATE (
+    COUNTROWS ( 'olist v_pbi_orders' ),
+    'olist v_pbi_orders'[is_bad_review] = 1
+)
+
+-- 7  ★核心指标
+差评率 = DIVIDE ( [差评订单数], [有评分订单数] )
+
+
+-- ═══ C 组：迟到率（P3/P4 页用）════════════════════════════════════════════
+
+-- 8  迟到率的分母：只数已送达订单
+已送达订单数 =
+CALCULATE (
+    COUNTROWS ( 'olist v_pbi_orders' ),
+    'olist v_pbi_orders'[is_delivered] = 1
+)
+
+-- 9
+迟到订单数 =
+CALCULATE (
+    COUNTROWS ( 'olist v_pbi_orders' ),
+    'olist v_pbi_orders'[is_late] = 1
+)
+
+-- 10
+迟到率 = DIVIDE ( [迟到订单数], [已送达订单数] )
+
+
+-- ═══ D 组：超期发货率 ══════════════════════════════════════════════════════
+
+-- 11  分母：只数"能判断是否超期"的订单（排除无明细/无期限的）
+可判定发货订单数 =
+CALCULATE (
+    COUNTROWS ( 'olist v_pbi_orders' ),
+    NOT ISBLANK ( 'olist v_pbi_orders'[is_overdue_ship] )
+)
+
+-- 12
+超期发货订单数 =
+CALCULATE (
+    COUNTROWS ( 'olist v_pbi_orders' ),
+    'olist v_pbi_orders'[is_overdue_ship] = 1
+)
+
+-- 13
+超期发货率 = DIVIDE ( [超期发货订单数], [可判定发货订单数] )
+
+
+-- ═══ E 组：三段耗时（P3 页堆积图/环形图用）════════════════════════════════
+
+-- 14
+平均审核天数 = AVERAGE ( 'olist v_pbi_orders'[approve_days] )
+
+-- 15
+平均备货天数 = AVERAGE ( 'olist v_pbi_orders'[prep_days] )
+
+-- 16
+平均运输天数 = AVERAGE ( 'olist v_pbi_orders'[ship_days] )
+
+-- 17
+平均全程天数 = AVERAGE ( 'olist v_pbi_orders'[total_days] )
+
+
+/* ===========================================================================
+   二、计算列（7 个必需 + 2 个可选）
+   =========================================================================== */
+
+-- ═══ 必需 1：迟到标签（P2 图1 的 X 轴）════════════════════════════════════
+迟到标签 =
+SWITCH (
+    TRUE (),
+    'olist v_pbi_orders'[is_delivered] = 0,        "未送达",
+    ISBLANK ( 'olist v_pbi_orders'[is_late] ),     "无法判断",
+    'olist v_pbi_orders'[is_late] = 1,             "迟到",
+    "准时"
+)
+
+
+-- ═══ 必需 2：富余档（P2 图2 的 X 轴 —— 悬崖效应，最重要的一张图）═════════
+富余档 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[buffer_days] ), "未送达",
+    'olist v_pbi_orders'[buffer_days] < 0,         "① 已超期",
+    'olist v_pbi_orders'[buffer_days] < 3,         "② 富余0-3天",
+    'olist v_pbi_orders'[buffer_days] < 7,         "③ 富余3-7天",
+    'olist v_pbi_orders'[buffer_days] < 15,        "④ 富余7-15天",
+    "⑤ 富余15天以上"
+)
+
+
+-- ═══ 必需 3：备货档（P2 图3 的 X 轴）═════════════════════════════════════
+备货档 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[prep_days] ), "未知",
+    'olist v_pbi_orders'[prep_days] <= 1,        "① 1天内",
+    'olist v_pbi_orders'[prep_days] <= 3,        "② 1-3天",
+    'olist v_pbi_orders'[prep_days] <= 7,        "③ 3-7天",
+    'olist v_pbi_orders'[prep_days] <= 14,       "④ 7-14天",
+    "⑤ 14天以上"
+)
+
+
+-- ═══ 必需 4：运输档（P2 图4 的 X 轴）═════════════════════════════════════
+运输档 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[ship_days] ), "未知",
+    'olist v_pbi_orders'[ship_days] <= 3,        "① 3天内",
+    'olist v_pbi_orders'[ship_days] <= 7,        "② 3-7天",
+    'olist v_pbi_orders'[ship_days] <= 14,       "③ 7-14天",
+    'olist v_pbi_orders'[ship_days] <= 21,       "④ 14-21天",
+    "⑤ 21天以上"
+)
+
+
+-- ═══ 必需 5：是否超期（P2 图5 的 X 轴）═══════════════════════════════════
+是否超期 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[is_overdue_ship] ), "无法判断",
+    'olist v_pbi_orders'[is_overdue_ship] = 1,         "超期发货",
+    "按期发货"
+)
+
+
+-- ═══ 必需 6：是否跨州（P2 图6 的 X 轴）═══════════════════════════════════
+是否跨州 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[is_cross_state] ), "无法判断",
+    'olist v_pbi_orders'[is_cross_state] = 1,         "跨州",
+    "同州"
+)
+
+
+-- ═══ 必需 7：订单状态中文（P1 环形图用）══════════════════════════════════
+订单状态中文 =
+SWITCH (
+    'olist v_pbi_orders'[order_status],
+    "delivered",   "已送达",
+    "shipped",     "运输中",
+    "canceled",    "已取消",
+    "unavailable", "无货",
+    "invoiced",    "已开票",
+    "processing",  "处理中",
+    "created",     "已创建",
+    "approved",    "已审核",
+    "其他"
+)
+
+
+-- ═══ 可选 8：商品件数档（件数越多差评越高的发现）══════════════════════════
+商品件数档 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[item_count] ), "未知",
+    'olist v_pbi_orders'[item_count] = 1,         "① 1件",
+    'olist v_pbi_orders'[item_count] <= 3,        "② 2-3件",
+    'olist v_pbi_orders'[item_count] <= 5,        "③ 4-5件",
+    "④ 6件以上"
+)
+
+
+-- ═══ 可选 9：卖家数量档（多卖家订单差评率异常的发现）══════════════════════
+卖家数量档 =
+SWITCH (
+    TRUE (),
+    ISBLANK ( 'olist v_pbi_orders'[seller_count] ), "未知",
+    'olist v_pbi_orders'[seller_count] = 1,         "① 单卖家",
+    'olist v_pbi_orders'[seller_count] = 2,         "② 2个卖家",
+    "③ 3个卖家以上"
+)
+
+
+/* ===========================================================================
+   三、格式设置（建完必须做）
+   =========================================================================== */
+
+-- 差评率 / 迟到率 / 超期发货率  → 度量值工具 → 格式 → 百分比、2 位小数
+-- 平均评分                      → 小数、2 位
+-- 客单价 / 订单总额             → 货币、2 位
+-- 订单数 / 各类订单数           → 整数、千分位
+-- 平均*天数                     → 小数、2 位
+
+
+/* ===========================================================================
+   四、验证数字（对不上就是 DAX 或筛选器有问题）
+   =========================================================================== */
+
+-- 【卡片验证】
+--   订单数        → 99,441
+--   订单总额      → 15,843,553.24
+--   客单价        → 160.58
+--   平均评分      → 4.09
+--   差评率        → 14.63%
+--   迟到率        → 8.11%
+--   超期发货率    → 9.06%
+--   平均审核天数  → 0.43
+--   平均备货天数  → 2.81
+--   平均运输天数  → 9.33
+--   平均全程天数  → 12.56
+
+-- 【P2 加了 is_delivered = 1 页面筛选器后，各图预期】
+--
+--   图1 迟到标签：  准时 9.18% / 迟到 53.94%
+--   图2 富余档：    ① 53.98% / ② 11.16% / ③ 9.83% / ④ 8.79% / ⑤ 9.14%
+--   图3 备货档：    ① 9.84% / ② 11.66% / ③ 14.45% / ④ 21.03% / ⑤ 41.56%
+--   图4 运输档：    ① 8.46% / ② 9.02% / ③ 10.05% / ④ 14.55% / ⑤ 48.01%
+--   图5 是否超期：  按期 11.68% / 超期 23.69%
+--   图6 是否跨州：  同州 10.43% / 跨州 14.07%
